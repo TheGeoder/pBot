@@ -30,6 +30,7 @@ jobs:
         with:
           target: ${{ matrix.config.target }}
           combine: true
+          build-args: --verbose
 
   package:
     name: Package pBot
