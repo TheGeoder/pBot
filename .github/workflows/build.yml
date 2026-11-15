@@ -1,0 +1,48 @@
+name: Build pBot
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    name: Build ${{ matrix.config.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: Android32
+            target: Android32
+
+          - name: Android64
+            target: Android64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build pBot
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: ${{ matrix.config.target }}
+          combine: true
+
+  package:
+    name: Package pBot
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Combine builds
+        uses: geode-sdk/build-geode-mod/combine@main
+        id: combine
+
+      - name: Upload pBot
+        uses: actions/upload-artifact@v7
+        with:
+          name: pBot-Android
+          path: ${{ steps.combine.outputs.build-output }}
