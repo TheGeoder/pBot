@@ -1,0 +1,12 @@
+{
+    "geode": "v5.0.0",
+    "gd": {
+        "android": "2.2081",
+        "win": "2.2081"
+    },
+    "id": "tniuriblety.pbot",
+    "name": "pBot",
+    "version": "v1.0.0",
+    "developer": "Tniuriblety",
+    "description": "A Geometry Dash macro recording and playback tool."
+}
