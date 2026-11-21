@@ -1,49 +1,61 @@
-name: Build pBot
+name: Build Geode Mod
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - "**"
+      - '**'
 
 jobs:
   build:
-    name: Build ${{ matrix.config.name }}
-    runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         config:
-          - name: Android32
-            target: Android32
+        - name: Windows
+          os: windows-latest
+        - name: Android32
+          os: ubuntu-latest
+          target: Android32
+        - name: Android64
+          os: ubuntu-latest
+          target: Android64
+        - name: macOS
+          os: macos-latest
+        - name: iOS
+          os: macos-latest
+          target: iOS        
 
-          - name: Android64
-            target: Android64
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
 
-      - name: Build pBot
+      - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          target: ${{ matrix.config.target }}
+          bindings: 'Tniuriblety/bindings'
+          #build-config: 'RelWithDebInfo'
+          build-config: 'Release'
+          export-pdb: true
           combine: true
-          build-args: --verbose
-
+          #sdk: 'nightly'
+          target: ${{ matrix.config.target }}
+      
   package:
-    name: Package pBot
+    name: Package builds
     runs-on: ubuntu-latest
-    needs: build
+    needs: ['build']
 
     steps:
-      - name: Combine builds
-        uses: geode-sdk/build-geode-mod/combine@main
-        id: combine
+      - uses: geode-sdk/build-geode-mod/combine@main
+        id: build
 
-      - name: Upload pBot
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         with:
-          name: pBot-Android
-          path: ${{ steps.combine.outputs.build-output }}
+          name: Build Output
+          path: ${{ steps.build.outputs.build-output }}
